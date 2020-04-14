@@ -1,6 +1,10 @@
-//author: wujp
-//date: 2020-04-13
-//file: circle_loss_layer.hpp/cpp/cu
+/*
+name: CircleLossLayer
+file: circle_loss_layer.hpp/cpp/cu
+date        author  log
+------------------------------------
+2020-04-13  wujp    created
+*/
 
 #ifndef CAFFE_CIRCLE_LOSS_LAYER_HPP_
 #define CAFFE_CIRCLE_LOSS_LAYER_HPP_
