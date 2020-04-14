@@ -92,12 +92,12 @@ void CircleLossLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   
   Dtype* prob_n = prob_n_.template mutable_cpu_data<Dtype>();
   Dtype* prob_p = prob_p_.template mutable_cpu_data<Dtype>();
-  Dtype lse_n = calc_logsumexp((const Dtype*)logit_n, n_num, prob_n);
-  Dtype lse_p = calc_logsumexp((const Dtype*)logit_p, p_num, prob_p);
+  Dtype lse_n = Safe_LogSumExp((const Dtype*)logit_n, n_num, prob_n);
+  Dtype lse_p = Safe_LogSumExp((const Dtype*)logit_p, p_num, prob_p);
   
   //LOG(INFO) << "lse_p = " << lse_p << ", lse_n = " << lse_n << ", p_num = " << p_num << ", n_num = " << n_num;
   
-  Dtype loss = calc_softplus(lse_p + lse_n);
+  Dtype loss = Safe_SoftPlus(lse_p + lse_n);
   top[0]->mutable_cpu_data<Dtype>()[0] = loss;
   
   Dtype Z = 1 - exp(-loss);
