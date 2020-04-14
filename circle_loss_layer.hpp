@@ -1,10 +1,10 @@
-/*
-name: CircleLossLayer
-file: circle_loss_layer.hpp/cpp/cu
-date        author  log
-------------------------------------
-2020-04-13  wujp    created
-*/
+/***************************************
+* name: CircleLossLayer
+* file: circle_loss_layer.hpp/cpp/cu
+* date        author    log
+* ------------------------------------
+* 2020-04-13  wujp      created
+***************************************/
 
 #ifndef CAFFE_CIRCLE_LOSS_LAYER_HPP_
 #define CAFFE_CIRCLE_LOSS_LAYER_HPP_
@@ -14,7 +14,7 @@ date        author  log
 #include "caffe/layers/loss_layer.hpp"
 
 namespace caffe {
-
+  
 template <typename Ftype, typename Btype>
 class CircleLossLayer : public LossLayer<Ftype, Btype> {
   typedef Ftype Dtype;
@@ -25,10 +25,10 @@ class CircleLossLayer : public LossLayer<Ftype, Btype> {
       const vector<Blob*>& top);
   virtual void Reshape(const vector<Blob*>& bottom,
       const vector<Blob*>& top);
-
+      
   virtual inline const char* type() const { return "CircleLoss"; }
   virtual inline int ExactNumBottomBlobs() const { return 2; }
-    
+  
  protected:
   void ComputeDiff_cpu(const Dtype* x_1, const Dtype* x_2,
       const Dtype x_1_norm, const Dtype x_2_norm, const Dtype inner_val, Dtype* x_1_diff);
@@ -50,7 +50,7 @@ class CircleLossLayer : public LossLayer<Ftype, Btype> {
   TBlob<Dtype> norm_;
   TBlob<Dtype> bottom_diff_;
   TBlob<Dtype> diff_1_;
-  TBlob<Dtype> diff_2_;  
+  TBlob<Dtype> diff_2_;
   
   TBlob<Dtype> logit_n_;
   TBlob<Dtype> logit_p_;
@@ -63,7 +63,7 @@ class CircleLossLayer : public LossLayer<Ftype, Btype> {
   TBlob<Dtype> idx_n1_;
   TBlob<Dtype> idx_n2_;
   TBlob<Dtype> idx_p1_;
-  TBlob<Dtype> idx_p2_;  
+  TBlob<Dtype> idx_p2_;
   
   int batch_size_;
   int fea_dim_;
@@ -72,7 +72,7 @@ class CircleLossLayer : public LossLayer<Ftype, Btype> {
   Dtype delta_p_;
   Dtype delta_n_;
   Dtype optimum_p_;
-  Dtype optimum_n_;  
+  Dtype optimum_n_;
 };
 
 }
