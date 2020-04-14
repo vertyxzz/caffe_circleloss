@@ -23,26 +23,33 @@ void CircleLossLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
   
   batch_size_ = bottom[0]->num();
   fea_dim_ = bottom[0]->count(1);
-    
-  inner_matrix_.Reshape(batch_size_, batch_size_, 1, 1);
-  norm_.Reshape(batch_size_, 1, 1, 1);
-  bottom_diff_.Reshape(batch_size_, fea_dim_, 1, 1);
-  diff_1_.Reshape(fea_dim_, 1, 1, 1);
-  diff_2_.Reshape(fea_dim_, 1, 1, 1);
+  
+  vector<int> shape_2d{batch_size_, batch_size_};
+  inner_matrix_.Reshape(shape_2d);
+  shape_2d[1] = fea_dim_;
+  bottom_diff_.Reshape(shape_2d);
+  
+  vector<int> shape_1d{batch_size_};
+  norm_.Reshape(shape_1d);
+  
+  shape_1d[0] = fea_dim_;
+  diff_1_.Reshape(shape_1d);
+  diff_2_.Reshape(shape_1d);
   
   int max_pair_num = batch_size_ * (batch_size_-1) / 2;
-  logit_n_.Reshape(max_pair_num, 1, 1, 1);
-  logit_p_.Reshape(max_pair_num, 1, 1, 1);
-  prob_n_.Reshape(max_pair_num, 1, 1, 1);
-  prob_p_.Reshape(max_pair_num, 1, 1, 1);
-  cos_n_.Reshape(max_pair_num, 1, 1, 1);
-  cos_p_.Reshape(max_pair_num, 1, 1, 1);
-  inner_n_.Reshape(max_pair_num, 1, 1, 1);
-  inner_p_.Reshape(max_pair_num, 1, 1, 1);
-  idx_n1_.Reshape(max_pair_num, 1, 1, 1);
-  idx_n2_.Reshape(max_pair_num, 1, 1, 1);
-  idx_p1_.Reshape(max_pair_num, 1, 1, 1);
-  idx_p2_.Reshape(max_pair_num, 1, 1, 1);
+  shape_1d[0] = max_pair_num;
+  logit_n_.Reshape(shape_1d);
+  logit_p_.Reshape(shape_1d);
+  prob_n_.Reshape(shape_1d);
+  prob_p_.Reshape(shape_1d);
+  cos_n_.Reshape(shape_1d);
+  cos_p_.Reshape(shape_1d);
+  inner_n_.Reshape(shape_1d);
+  inner_p_.Reshape(shape_1d);
+  idx_n1_.Reshape(shape_1d);
+  idx_n2_.Reshape(shape_1d);
+  idx_p1_.Reshape(shape_1d);
+  idx_p2_.Reshape(shape_1d);
 }
 
 template <typename Ftype, typename Btype>
