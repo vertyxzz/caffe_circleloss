@@ -10,10 +10,10 @@ void CircleLossLayer<Ftype, Btype>::LayerSetUp(const vector<Blob*>& bottom,
     
   gamma_ = this->layer_param_.circle_loss_param().gamma();
   margin_ = this->layer_param_.circle_loss_param().margin();
-  delta_p_ = 1 - margin_;
   delta_n_ = margin_;
-  optimum_p_ = 1 + margin_;
+  delta_p_ = 1 - margin_;
   optimum_n_ = -margin_;
+  optimum_p_ = 1 + margin_;  
 }
 
 template <typename Ftype, typename Btype>
@@ -46,7 +46,7 @@ void CircleLossLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
 }
 
 template <typename Ftype, typename Btype>
-Ftype CircleLossLayer<Ftype, Btype>::calc_softplus(Dtype x) {
+Ftype CircleLossLayer<Ftype, Btype>::Safe_SoftPlus(Dtype x) {
   // log(1+e(x)) = log(1+e(-abs(x))) + max(x,0)
   Dtype x_abs = x;
   Dtype x_max = x;
@@ -59,7 +59,7 @@ Ftype CircleLossLayer<Ftype, Btype>::calc_softplus(Dtype x) {
 }
 
 template <typename Ftype, typename Btype>
-Ftype CircleLossLayer<Ftype, Btype>::calc_logsumexp(const Dtype* x, int x_len, Dtype* prob) {
+Ftype CircleLossLayer<Ftype, Btype>::Safe_LogSumExp(const Dtype* x, int x_len, Dtype* prob) {
   // log(exp(x1)+exp(x2)+...) = log(exp(x1-max(x))+exp(x2-max(x))+...) + max(x)
   if (x_len <= 0)
     return 0;
@@ -166,10 +166,10 @@ void CircleLossLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
   
   Dtype* prob_n = prob_n_.template mutable_cpu_data<Dtype>();
   Dtype* prob_p = prob_p_.template mutable_cpu_data<Dtype>();
-  Dtype lse_n = calc_logsumexp((const Dtype*)logit_n, n_num, prob_n);
-  Dtype lse_p = calc_logsumexp((const Dtype*)logit_p, p_num, prob_p);
+  Dtype lse_n = Safe_LogSumExp((const Dtype*)logit_n, n_num, prob_n);
+  Dtype lse_p = Safe_LogSumExp((const Dtype*)logit_p, p_num, prob_p);
   
-  Dtype loss = calc_softplus(lse_p + lse_n);
+  Dtype loss = Safe_SoftPlus(lse_p + lse_n);
   top[0]->mutable_cpu_data<Dtype>()[0] = loss;
   
   Dtype Z = 1 - exp(-loss);
