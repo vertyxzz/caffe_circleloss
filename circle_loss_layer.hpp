@@ -43,8 +43,8 @@ class CircleLossLayer : public LossLayer<Ftype, Btype> {
   virtual void Backward_gpu(const vector<Blob*>& top,
       const vector<bool>& propagate_down, const vector<Blob*>& bottom);
       
-  Dtype calc_softplus(Dtype x);
-  Dtype calc_logsumexp(const Dtype* x, int x_len, Dtype* prob = nullptr);
+  Dtype Safe_SoftPlus(Dtype x);
+  Dtype Safe_LogSumExp(const Dtype* x, int x_len, Dtype* prob = nullptr);
   
   TBlob<Dtype> inner_matrix_;
   TBlob<Dtype> norm_;
@@ -68,11 +68,11 @@ class CircleLossLayer : public LossLayer<Ftype, Btype> {
   int batch_size_;
   int fea_dim_;
   Dtype gamma_;
-  Dtype margin_;
-  Dtype delta_p_;
+  Dtype margin_;  
   Dtype delta_n_;
-  Dtype optimum_p_;
+  Dtype delta_p_;
   Dtype optimum_n_;
+  Dtype optimum_p_;
 };
 
 }
