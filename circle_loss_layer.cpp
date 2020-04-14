@@ -6,9 +6,24 @@ namespace caffe {
 template <typename Ftype, typename Btype>
 void CircleLossLayer<Ftype, Btype>::LayerSetUp(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
+  LossLayer<Ftype, Btype>::LayerSetUp(bottom, top);
+    
+  gamma_ = this->layer_param_.circle_loss_param().gamma();
+  margin_ = this->layer_param_.circle_loss_param().margin();
+  delta_p_ = 1 - margin_;
+  delta_n_ = margin_;
+  optimum_p_ = 1 + margin_;
+  optimum_n_ = -margin_;
+}
+
+template <typename Ftype, typename Btype>
+void CircleLossLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
+    const vector<Blob*>& top) {
+  LossLayer<Ftype, Btype>::Reshape(bottom, top);
+  
   batch_size_ = bottom[0]->num();
   fea_dim_ = bottom[0]->count(1);
-  
+    
   inner_matrix_.Reshape(batch_size_, batch_size_, 1, 1);
   norm_.Reshape(batch_size_, 1, 1, 1);
   bottom_diff_.Reshape(batch_size_, fea_dim_, 1, 1);
@@ -28,21 +43,6 @@ void CircleLossLayer<Ftype, Btype>::LayerSetUp(const vector<Blob*>& bottom,
   idx_n2_.Reshape(max_pair_num, 1, 1, 1);
   idx_p1_.Reshape(max_pair_num, 1, 1, 1);
   idx_p2_.Reshape(max_pair_num, 1, 1, 1);
-  
-  gamma_ = this->layer_param_.circle_loss_param().gamma();
-  margin_ = this->layer_param_.circle_loss_param().margin();
-  delta_p_ = 1 - margin_;
-  delta_n_ = margin_;
-  optimum_p_ = 1 + margin_;
-  optimum_n_ = -margin_;
-}
-
-template <typename Ftype, typename Btype>
-void CircleLossLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
-    const vector<Blob*>& top) {
-  vector<int> loss_shape(0);
-  top[0]->Reshape(loss_shape);
-  caffe_set(bottom_diff_.count(), Dtype(0), bottom_diff_.template mutable_cpu_data<Dtype>());
 }
 
 template <typename Ftype, typename Btype>
@@ -102,6 +102,7 @@ void CircleLossLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
   const Dtype* fea_val = bottom[0]->cpu_data<Dtype>();
   const Dtype* label_val = bottom[1]->cpu_data<Dtype>();
   Dtype* bottom_diff = bottom_diff_.template mutable_cpu_data<Dtype>();
+  caffe_set(bottom_diff_.count(), Dtype(0), bottom_diff);
   
   caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, batch_size_, batch_size_,
     fea_dim_, Dtype(1), fea_val, fea_val, Dtype(0), inner_matrix_.template mutable_cpu_data<Dtype>());
@@ -170,7 +171,7 @@ void CircleLossLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
   
   Dtype loss = calc_softplus(lse_p + lse_n);
   top[0]->mutable_cpu_data<Dtype>()[0] = loss;
-
+  
   Dtype Z = 1 - exp(-loss);
   for (int i=0; i<n_num; ++i) {
     Dtype loss_2_simi = Z * prob_n[i] * (gamma_ * (cos_n[i] + margin_));
