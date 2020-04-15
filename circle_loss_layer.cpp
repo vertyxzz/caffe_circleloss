@@ -7,13 +7,13 @@ template <typename Ftype, typename Btype>
 void CircleLossLayer<Ftype, Btype>::LayerSetUp(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
   LossLayer<Ftype, Btype>::LayerSetUp(bottom, top);
-    
+  
   gamma_ = this->layer_param_.circle_loss_param().gamma();
   margin_ = this->layer_param_.circle_loss_param().margin();
   delta_n_ = margin_;
   delta_p_ = 1 - margin_;
   optimum_n_ = -margin_;
-  optimum_p_ = 1 + margin_;  
+  optimum_p_ = 1 + margin_;
 }
 
 template <typename Ftype, typename Btype>
@@ -50,6 +50,8 @@ void CircleLossLayer<Ftype, Btype>::Reshape(const vector<Blob*>& bottom,
   idx_n2_.Reshape(shape_1d);
   idx_p1_.Reshape(shape_1d);
   idx_p2_.Reshape(shape_1d);
+  
+  caffe_set(bottom_diff_.count(), Dtype(0), bottom_diff_.template mutable_cpu_data<Dtype>());
 }
 
 template <typename Ftype, typename Btype>
@@ -105,12 +107,11 @@ void CircleLossLayer<Ftype, Btype>::ComputeDiff_cpu(const Dtype* x_1, const Dtyp
 template <typename Ftype, typename Btype>
 void CircleLossLayer<Ftype, Btype>::Forward_cpu(const vector<Blob*>& bottom,
     const vector<Blob*>& top) {
-  const Dtype eps = Dtype(1e-5);  
+  const Dtype eps = Dtype(1e-5);
   const Dtype* fea_val = bottom[0]->cpu_data<Dtype>();
   const Dtype* label_val = bottom[1]->cpu_data<Dtype>();
   Dtype* bottom_diff = bottom_diff_.template mutable_cpu_data<Dtype>();
-  caffe_set(bottom_diff_.count(), Dtype(0), bottom_diff);
-  
+    
   caffe_cpu_gemm<Dtype>(CblasNoTrans, CblasTrans, batch_size_, batch_size_,
     fea_dim_, Dtype(1), fea_val, fea_val, Dtype(0), inner_matrix_.template mutable_cpu_data<Dtype>());
     
