@@ -1,9 +1,8 @@
 /***************************************
-* name: CircleLossLayer
-* file: circle_loss_layer.hpp/cpp/cu
-* date        author    log
-* ------------------------------------
-* 2020-04-13  wujp      created
+* name:   CircleLossLayer
+* file:   circle_loss_layer.hpp/cpp/cu
+* author: wujp
+* date:   2020-04-15
 ***************************************/
 
 #ifndef CAFFE_CIRCLE_LOSS_LAYER_HPP_
@@ -68,7 +67,7 @@ class CircleLossLayer : public LossLayer<Ftype, Btype> {
   int batch_size_;
   int fea_dim_;
   Dtype gamma_;
-  Dtype margin_;  
+  Dtype margin_;
   Dtype delta_n_;
   Dtype delta_p_;
   Dtype optimum_n_;
