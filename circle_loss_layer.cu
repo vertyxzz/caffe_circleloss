@@ -18,7 +18,6 @@ void CircleLossLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   const Dtype* fea_val = bottom[0]->gpu_data<Dtype>();
   const Dtype* label_val = bottom[1]->cpu_data<Dtype>();
   Dtype* bottom_diff = bottom_diff_.template mutable_gpu_data<Dtype>();
-  caffe_set(bottom_diff_.count(), Dtype(0), bottom_diff_.template mutable_cpu_data<Dtype>());
   
 //LOG(INFO) << "fea_1 = " << bottom[0]->cpu_data<Dtype>()[0] << ", fea_2 = " << bottom[0]->cpu_data<Dtype>()[1] << ", fea_3 = " << bottom[0]->cpu_data<Dtype>()[2];
 //LOG(INFO) << "label_1 = " << label_val[0] << ", label_2 = " << label_val[1] << ", label_3 = " << label_val[2];
@@ -95,7 +94,7 @@ void CircleLossLayer<Ftype, Btype>::Forward_gpu(const vector<Blob*>& bottom,
   Dtype lse_n = Safe_LogSumExp((const Dtype*)logit_n, n_num, prob_n);
   Dtype lse_p = Safe_LogSumExp((const Dtype*)logit_p, p_num, prob_p);
   
-  //LOG(INFO) << "lse_p = " << lse_p << ", lse_n = " << lse_n << ", p_num = " << p_num << ", n_num = " << n_num;
+//LOG(INFO) << "lse_p = " << lse_p << ", lse_n = " << lse_n << ", p_num = " << p_num << ", n_num = " << n_num;
   
   Dtype loss = Safe_SoftPlus(lse_p + lse_n);
   top[0]->mutable_cpu_data<Dtype>()[0] = loss;
